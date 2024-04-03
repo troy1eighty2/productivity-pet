@@ -47,6 +47,16 @@ def destroyWin():
     window.destroy()
     return
 
+
+def rightClick(event):
+    speech_Bubble_Text = tk.Label(window, text = "Hello there!")
+    speech_Bubble_Text.place(x = 0, y = 0)
+    print("click")
+
+def leftClick(event):
+    pass
+
+
 idle = [tk.PhotoImage(file=impath+'idle.gif',format = 'gif -index %i' %(i)) for i in range(5)]
 idle_to_sleep = [tk.PhotoImage(file=impath+'idle_to_sleep.gif',format = 'gif -index %i' %(i)) for i in range(8)]
 sleep = [tk.PhotoImage(file=impath+'sleep.gif',format = 'gif -index %i' %(i)) for i in range(3)]
@@ -55,10 +65,15 @@ walk_positive = [tk.PhotoImage(file=impath+'walking_positive.gif',format = 'gif 
 walk_negative = [tk.PhotoImage(file=impath+'walking_negative.gif',format = 'gif -index %i' %(i)) for i in range(8)]
 
 label = tk.Label(window, bd = 0, bg='black')
+
 window.overrideredirect(True)
 window.wm_attributes('-transparentcolor','black')
 
 window.bind('<Control-k>', destroyWin)
+# Bind left-click event
+window.bind("<Button-1>", leftClick)
+# Bind right-click event
+window.bind("<Button-3>", rightClick)
 window.after(0, event)
 label.pack()
 window.mainloop()
