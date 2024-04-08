@@ -62,6 +62,35 @@ def destroyWin():
     return
 
 
+def submit(window_4, taskname_answer, prio_answer, table):
+    task_name =taskname_answer.get()
+    prio_name =prio_answer.get()
+    if task_name == "":
+        pass
+    else:
+        addTodo(conn, table, window_2, task_name, prio_name)
+
+    window_4.destroy()
+
+
+def prompt(table): 
+    window_4 = tk.Toplevel()
+
+    taskname_question = tk.Label(window_4, text = "Task Name")
+    taskname_question.pack()
+    taskname_answer = tk.Entry(window_4)
+    taskname_answer.pack()
+
+    prio_question = tk.Label(window_4, text = "Priority")
+    prio_question.pack()
+    prio_answer = tk.Entry(window_4)
+    prio_answer.pack()
+
+    submit_button = tk.Button(window_4, text="Submit", command=lambda: submit(window_4, taskname_answer, prio_answer, table))
+    submit_button.pack()
+    
+    pass
+
 def rightClick(event):
     global window_3
     if not window_3:
@@ -88,7 +117,7 @@ def leftClick(event):
         table.bind("<Double-Button-1>", lambda event:deleteDB(conn,table,event, window_2))
         table.pack()
 
-        add = tk.Button(frame_2, text="Add", command=lambda: addTodo(conn, table, window_2, "task", 1))
+        add = tk.Button(frame_2, text="Add", command=lambda: prompt(table))
         add.pack()
         clear = tk.Button(frame_2, text="Clear", command=lambda: clearDB(conn, table, window_2))
         clear.pack()

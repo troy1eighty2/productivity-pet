@@ -13,11 +13,10 @@ def deleteDB(conn, table, window_2, event):
         conn.commit()
         displayTreeview(conn, table, window_2)
 
-    
 
 def displayTreeview(conn, table, window_2):
     c = conn.cursor()
-    c.execute("SELECT * FROM tasks")
+    c.execute("SELECT * FROM tasks ORDER BY priority ASC")
     rows = c.fetchall()
 
     for item in table.get_children():
