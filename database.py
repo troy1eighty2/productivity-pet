@@ -1,5 +1,6 @@
 import sqlite3
 import tkinter as tk
+from datetime import datetime
 
 
 def deleteDB(conn, table, window_2, event):
@@ -14,21 +15,36 @@ def deleteDB(conn, table, window_2, event):
         displayTreeview(conn, table, window_2)
 
 
+def is_valid_date_format(date_str, date_format):
+    try:
+        datetime.strptime(date_str, date_format)
+        return True
+    except ValueError:
+        return False
+
+
 def displayTreeview(conn, table, window_2):
     c = conn.cursor()
-    c.execute("SELECT * FROM tasks ORDER BY priority ASC")
+    c.execute("SELECT * FROM tasks ORDER BY priority ASC, date ASC")
     rows = c.fetchall()
 
     for item in table.get_children():
         table.delete(item)
 
     for n in rows:
+        sql_date = ""
         id_ = n[0]
+        # Convert the string to a datetime object
+        if n[1] and is_valid_date_format(n[1], "%m/%d/%y"):
+            date_obj = datetime.strptime(n[1], "%m/%d/%y")
+            sql_date = date_obj.strftime("%y-%m-%d")
+        else:
+            pass
         item_id = table.insert(
                 "",
                 tk.END,
-                text = n[1],
-                values = (n[2]),
+                text = sql_date,
+                values = (n[2], n[3], n[4]),
                 tags = (id_)
         )
         table.tag_bind(item_id, '<Button-3>', lambda event, item_id=item_id:deleteDB(event, item_id))
@@ -58,8 +74,10 @@ def create_connection(db_file):
         create_table = """
             CREATE TABLE IF NOT EXISTS tasks(
                 id INTEGER PRIMARY KEY,
-                name TEXT,
-                priority INTEGER
+                date TEXT,
+                priority INTEGER,
+                task TEXT,
+                notes TEXT
         );"""
 
         c.execute(create_table)
@@ -68,15 +86,15 @@ def create_connection(db_file):
         return conn
 
 
-def addTodo (conn, table, window_2, task, prio):
+def addTodo (conn, table, window_2, date, prio, task, notes):
 
     c = conn.cursor()
     insert_table = """
-        INSERT INTO tasks(name, priority)
-        VALUES(?, ?)
+        INSERT INTO tasks(date, priority, task, notes)
+        VALUES(?, ?, ?, ?)
     """
 
-    c.execute(insert_table, (task, prio))
+    c.execute(insert_table, (date, prio, task, notes))
     conn.commit()
     printDB(conn)
     displayTreeview(conn, table, window_2)

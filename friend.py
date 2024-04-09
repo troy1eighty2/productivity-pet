@@ -19,6 +19,7 @@ todo_active = False
 speech_active = False
 window_2 = None
 window_3 = None
+window_4 = None
 
 
 def animate(action, event_type, label, counter, resolution):
@@ -57,38 +58,61 @@ def event():
         window.after(2000, event)
 
 
-def destroyWin():
-    window.destroy()
+def destroyWin(destroy_me):
+    destroy_me.destroy()
     return
 
 
-def submit(window_4, taskname_answer, prio_answer, table):
-    task_name =taskname_answer.get()
-    prio_name =prio_answer.get()
-    if task_name == "":
+def submit(window_4, table, da, pa, ta, na):
+    date = da.get()
+    prio = pa.get()
+    task = ta.get()
+    notes = na.get()
+
+    if task == "":
         pass
     else:
-        addTodo(conn, table, window_2, task_name, prio_name)
+        addTodo(conn, table, window_2, date, prio, task, notes)
 
     window_4.destroy()
 
 
 def prompt(table): 
+    x_coord =window_2.winfo_x()
+    y_coord =window_2.winfo_y()
+    x_width =window_2.winfo_width()
+    y_length =window_2.winfo_height()
+    global window_4
+    if window_4:
+        window_4.destroy()
     window_4 = tk.Toplevel()
+    window_4.geometry(f"+{x_coord+(x_width//2)-50}+{y_coord+(y_length//2)-100}")
+    window_4.bind("<Escape>", lambda event:destroyWin(window_4))
 
-    taskname_question = tk.Label(window_4, text = "Task Name")
-    taskname_question.pack()
-    taskname_answer = tk.Entry(window_4)
-    taskname_answer.pack()
+    dd_question = tk.Label(window_4, text = "Due Date (d/m/yy)")
+    dd_question.pack()
+    dd_answer = tk.Entry(window_4)
+    dd_answer.pack()
 
     prio_question = tk.Label(window_4, text = "Priority")
     prio_question.pack()
     prio_answer = tk.Entry(window_4)
     prio_answer.pack()
 
-    submit_button = tk.Button(window_4, text="Submit", command=lambda: submit(window_4, taskname_answer, prio_answer, table))
+    taskname_question = tk.Label(window_4, text = "Task*")
+    taskname_question.pack()
+    taskname_answer = tk.Entry(window_4)
+    taskname_answer.pack()
+
+
+    notes_question = tk.Label(window_4, text = "Notes")
+    notes_question.pack()
+    notes_answer = tk.Entry(window_4)
+    notes_answer.pack()
+
+    submit_button = tk.Button(window_4, text="Submit", command=lambda: submit(window_4, table, dd_answer, prio_answer, taskname_answer, notes_answer))
     submit_button.pack()
-    
+
     pass
 
 def rightClick(event):
@@ -107,6 +131,7 @@ def leftClick(event):
     if not window_2:
         window_2 = tk.Toplevel()
         window_2.geometry(f"+{window_2.winfo_screenwidth()//2}+{window_2.winfo_screenheight()//2}")
+        window_2.bind("<Escape>", lambda event:destroyWin(window_2))
 
         frame_2 = tk.Frame(window_2)
         frame_2.pack(padx = 10, pady = 10)
@@ -124,12 +149,17 @@ def leftClick(event):
 
 
 
-        table["columns"] = ("Priority")
+        table["columns"] = ("Priority", "Task", "Notes")
         table.column("#0", width = 100)
         table.column("Priority", width = 100)
+        table.column("Task", width = 200)
+        table.column("Notes", width = 200)
 
-        table.heading("#0", text="name")
+        table.heading("#0", text="Due Date")
         table.heading("Priority", text="Priority")
+        table.heading("Task", text="Task")
+        table.heading("Notes", text="Notes")
+
         displayTreeview(conn, table, window_2)
 
     else:
